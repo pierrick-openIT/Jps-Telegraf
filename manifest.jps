@@ -31,7 +31,7 @@
           {
             "cmd": {
               "commands": [
-                wget https://dl.influxdata.com/telegraf/releases/telegraf-1.5.3-1.x86_64.rpm
+                "wget https://dl.influxdata.com/telegraf/releases/telegraf-1.5.3-1.x86_64.rpm",
                 "yum localinstall telegraf-1.5.3-1.x86_64.rpm"
               ],
               "nodeType": "${targetNodes[0].nodeType}",
