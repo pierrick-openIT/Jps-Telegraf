@@ -6,11 +6,11 @@
     "id": "telegraf-installer",
     "name": "Telegraf Yum Packages Installer on jelastic container",
     "categories": [
-      "apps/dev-and-admin-tools"
+      "apps/dev-and-admin-tools",
       "apps/monitoring-tools"
     ],
     "version": "1.0",
-    "homepage": "https://github.com/pierrick-openIT/Jps-Telegraf"
+    "homepage": "https://github.com/pierrick-openIT/Jps-Telegraf",
     "description": {
       "text": "Telegraf Yum Packages Installer on jelastic container.",
       "short": "Telegraf Yum Packages Installer on jelastic container."
