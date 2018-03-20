@@ -1,0 +1,116 @@
+{
+  "jpsVersion": "0.1",
+  "jpsType": "update",
+  "build": "20180320",
+  "application": {
+    "id": "telegraf-installer",
+    "name": "Telegraf Yum Packages Installer on jelastic container",
+    "categories": [
+      "apps/dev-and-admin-tools"
+      "apps/monitoring-tools"
+    ],
+    "version": "1.0",
+    "homepage": "https://github.com/pierrick-openIT/Jps-Telegraf",
+    "logo": "https://github.com/jelastic-jps/packages-installer/raw/master/images/rpm-logo.png",
+    "description": {
+      "text": "The Yum Packages Installer add-on is designed to integrate additional packages essential for your application but unavailable within Jelastic containers by default, including packages that require sudo permissions to be installed.",
+      "short": "The Yum Packages Installer to integrate additional development tools and RPM packages."
+    },
+  "targetNodes": {
+      "nodeType": "*"
+    },
+    "procedures": [
+      {
+        "id": "log",
+        "onCall": {
+          "log": "${this.message}"
+        }
+      },
+      {
+        "id": "installPackage",
+        "onCall": [
+          {
+            "cmd": {
+              "commands": [
+                "yum install -y ${this.packageInstall}"
+              ],
+              "nodeType": "${targetNodes[0].nodeType}",
+              "user": "root"
+            }
+          }
+        ]
+      },
+      {
+        "id": "removePackage",
+        "onCall": [
+          {
+            "cmd": {
+              "commands": [
+                "yum remove -y ${this.packageRemove}"
+              ],
+              "nodeType": "${targetNodes[0].nodeType}",
+              "user": "root"
+            }
+          }
+        ]
+      }
+    ],
+    "menu": [
+      {
+        "confirmText": "Install package",
+        "settings": "packageInstall",
+        "loadingText": "Installing package...",
+        "caption": "Install package",
+        "procedure": "installPackage",
+        "successText": "The package has been successfully installed"
+      },
+      {
+        "confirmText": "Remove package",
+        "settings": "packageRemove",
+        "loadingText": "Removing package...",
+        "caption": "Remove package",
+        "procedure": "removePackage",
+        "successText": "The package has been successfully removed"
+      }
+    ],
+    "settings": {
+      "packageInstall": {
+        "fields": [
+          {
+            "regexText": "Incorrect package name.",
+            "name": "packageInstall",
+            "caption": "Package:",
+            "type": "string",
+            "required": true
+          },
+          {
+            "caption": "Instruction:",
+            "type": "displayfield",
+            "markup": "To install a package, specify its name or URL in the box above. For several entries, use space as a separator.",
+            "required": true
+          }
+        ]
+      },
+      "packageRemove": {
+        "fields": [
+          {
+            "regexText": "Incorrect package name.",
+            "name": "packageRemove",
+            "caption": "Package:",
+            "type": "string",
+            "required": true
+          },
+          {
+            "caption": "Instruction:",
+            "type": "displayfield",
+            "markup": "To remove a package, specify its name in the box above. For several entries, use space as a separator.",
+            "required": true
+          }
+        ]
+      }
+    },
+    "success": {
+      "text": "Click <b>Add-ons</b> for a destination node to locate <b>Yum Packages Installer</b>. To use the add-on, expand the menu in the upper-right corner, click <b>Install package</b> and specify name and/or URL of the required packages."
+    }
+  }
+}
