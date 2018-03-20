@@ -1,116 +1,107 @@
 {
-  "jpsVersion": "0.1",
-  "jpsType": "update",
-  "build": "20180320",
-  "application": {
-    "id": "telegraf-installer",
-    "name": "Telegraf Yum Packages Installer on jelastic container",
-    "categories": [
-      "apps/dev-and-admin-tools",
-      "apps/monitoring-tools"
-    ],
-    "version": "1.0",
-    "homepage": "https://github.com/pierrick-openIT/Jps-Telegraf",
-    "description": {
-      "text": "Telegraf Yum Packages Installer on jelastic container.",
-      "short": "Telegraf Yum Packages Installer on jelastic container."
-    },
-  "targetNodes": {
-      "nodeType": "*"
-    },
-    "procedures": [
-      {
-        "id": "log",
-        "onCall": {
-          "log": "${this.message}"
+    "jpsVersion": "0.1",
+    "jpsType": "update",
+    "build": "20180320",
+    "application": {
+        "id": "telegraf-installer",
+        "name": "Telegraf-1.5.3-1 Yum CentOS",
+        "categories": [
+            "apps/dev-and-admin-tools",
+            "apps/monitoring-tools"
+        ],
+        "version": "1.0",
+        "homepage": "https://github.com/pierrick-openIT/Jps-Telegraf",
+        "description": {
+            "text": "Telegraf Yum Packages Installer on jelastic container.",
+            "short": "Telegraf Yum Packages Installer on jelastic container."
+        },
+        "targetNodes": {
+            "nodeType": "*"
+        },
+        "procedures": [{
+            "id": "log",
+            "onCall": {
+                "log": "${this.message}"
+            }
+        }, {
+            "id": "installPackage",
+            "onCall": [{
+                "cmd[${targetNodes.nodeGroup}]": {
+                    "commands": [
+                        "yum install -y wget",
+                        "wget https://dl.influxdata.com/telegraf/releases/telegraf-1.5.3-1.x86_64.rpm",
+                        "yum localinstall telegraf-1.5.3-1.x86_64.rpm",
+                        "systemctl enable telegraf",
+                        "systemctl start telegraf",
+                        "telegraf --input-filter ${this.TelegrafInput} --output-filter ${this.TelegrafOutput} config > /etc/telegraf/telegraf.conf " 
+                    ],
+                    "user": "root",
+                    "log": "${this.message}"
+                }
+            }]
+        }, {
+            "id": "removePackage",
+            "onCall": [{
+                "cmd": {
+                    "commands": [
+                        "yum remove -y telegraf-1.5.3-1"
+                    ],
+                    "nodeType": "${targetNodes[0].nodeType}",
+                    "user": "root"
+                }
+            }]
+        }],
+        "menu": [{
+            "confirmText": "Install package",
+            "settings": "packageInstall",
+            "loadingText": "Installing package...",
+            "caption": "Install package",
+            "procedure": "installPackage",
+            "successText": "The package has been successfully installed"
+        }, {
+            "confirmText": "Remove package",
+            "settings": "packageRemove",
+            "loadingText": "Removing package...",
+            "caption": "Remove package",
+            "procedure": "removePackage",
+            "successText": "The package has been successfully removed"
+        }],
+        
+        
+        "settings": {
+            "packageInstall": {
+                "fields": [{
+                        "regexText": "Incorrect input.",
+                        "name": "TelegrafInput",
+                        "caption": "Telegraf Input:",
+                        "type": "string",
+                        "required": true },
+
+                        {
+                        "regexText": "Incorrect output.",
+                        "name": "TelegrafOutput",
+                        "caption": "telegraf Output:",
+                        "type": "string",
+                        "required": true }]},
+                    
+                   
+                    "packageRemove": {
+                        "fields": [{
+                            "regexText": "Incorrect package name.",
+                            "name": "packageRemove",
+                            "caption": "Package:",
+                            "type": "string",
+                            "required": true
+                        }, {
+                            "caption": "Instruction:",
+                            "type": "displayfield",
+                            "markup": "To remove a package, specify its name in the box above. For several entries, use space as a separator.",
+                            "required": true
+                        }]
+                    }
+                },
+                "success": {
+                    "text": "Need to change this sweety text"
+                }
+            }
         }
-      },
-      {
-        "id": "installPackage",
-        "onCall": [
-          {
-            "cmd": {
-              "commands": [
-                "wget https://dl.influxdata.com/telegraf/releases/telegraf-1.5.3-1.x86_64.rpm",
-                "yum localinstall telegraf-1.5.3-1.x86_64.rpm"
-              ],
-              "nodeType": "${targetNodes[0].nodeType}",
-              "user": "root"
-            }
-          }
-        ]
-      },
-      {
-        "id": "removePackage",
-        "onCall": [
-          {
-            "cmd": {
-              "commands": [
-                "yum remove -y telegraf-1.5.3-1"
-              ],
-              "nodeType": "${targetNodes[0].nodeType}",
-              "user": "root"
-            }
-          }
-        ]
-      }
-    ],
-    "menu": [
-      {
-        "confirmText": "Install package",
-        "settings": "packageInstall",
-        "loadingText": "Installing package...",
-        "caption": "Install package",
-        "procedure": "installPackage",
-        "successText": "The package has been successfully installed"
-      },
-      {
-        "confirmText": "Remove package",
-        "settings": "packageRemove",
-        "loadingText": "Removing package...",
-        "caption": "Remove package",
-        "procedure": "removePackage",
-        "successText": "The package has been successfully removed"
-      }
-    ],
-    "settings": {
-      "packageInstall": {
-        "fields": [
-          {
-            "regexText": "Incorrect package name.",
-            "name": "packageInstall",
-            "caption": "Package:",
-            "type": "string",
-            "required": true
-          },
-          {
-            "caption": "Instruction:",
-            "type": "displayfield",
-            "markup": "To install a package, specify its name or URL in the box above. For several entries, use space as a separator.",
-            "required": true
-          }
-        ]
-      },
-      "packageRemove": {
-        "fields": [
-          {
-            "regexText": "Incorrect package name.",
-            "name": "packageRemove",
-            "caption": "Package:",
-            "type": "string",
-            "required": true
-          },
-          {
-            "caption": "Instruction:",
-            "type": "displayfield",
-            "markup": "To remove a package, specify its name in the box above. For several entries, use space as a separator.",
-            "required": true
-          }
-        ]
-      }
-    },
-    "success": {
-      "text": "Click <b>Add-ons</b> for a destination node to locate <b>Yum Packages Installer</b>. To use the add-on, expand the menu in the upper-right corner, click <b>Install package</b> and specify name and/or URL of the required packages."
-    }
-  }
-}
