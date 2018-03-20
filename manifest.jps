@@ -10,11 +10,10 @@
       "apps/monitoring-tools"
     ],
     "version": "1.0",
-    "homepage": "https://github.com/pierrick-openIT/Jps-Telegraf",
-    "logo": "https://github.com/jelastic-jps/packages-installer/raw/master/images/rpm-logo.png",
+    "homepage": "https://github.com/pierrick-openIT/Jps-Telegraf"
     "description": {
-      "text": "The Yum Packages Installer add-on is designed to integrate additional packages essential for your application but unavailable within Jelastic containers by default, including packages that require sudo permissions to be installed.",
-      "short": "The Yum Packages Installer to integrate additional development tools and RPM packages."
+      "text": "Telegraf Yum Packages Installer on jelastic container.",
+      "short": "Telegraf Yum Packages Installer on jelastic container."
     },
   "targetNodes": {
       "nodeType": "*"
@@ -32,7 +31,8 @@
           {
             "cmd": {
               "commands": [
-                "yum install -y ${this.packageInstall}"
+                wget https://dl.influxdata.com/telegraf/releases/telegraf-1.5.3-1.x86_64.rpm
+                "yum localinstall telegraf-1.5.3-1.x86_64.rpm"
               ],
               "nodeType": "${targetNodes[0].nodeType}",
               "user": "root"
@@ -46,7 +46,7 @@
           {
             "cmd": {
               "commands": [
-                "yum remove -y ${this.packageRemove}"
+                "yum remove -y telegraf-1.5.3-1"
               ],
               "nodeType": "${targetNodes[0].nodeType}",
               "user": "root"
