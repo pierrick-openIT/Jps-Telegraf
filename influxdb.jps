@@ -1,0 +1,115 @@
+{
+  "jpsType": "install",
+  "jpsVersion": "0.1",
+  "application": {
+    "id": "influxdb",
+    "name": "influxdb stack (influxDB, Chronograf,Kapacitor)",
+    "version": "10.0.6",
+    "type": "php",
+    "categories": [
+            "apps/dev-and-admin-tools",
+            "apps/monitoring-tools"
+],
+    "globals": {
+      "PASSWD": "${fn.password}"
+    },
+    "homepage": "https://www.influxdata.com/",
+    "logo": "https://2bjee8bvp8y263sjpl3xui1a-wpengine.netdna-ssl.com/wp-content/themes/influxdata3/images/influx-regular-white.svg",
+    "description": "A purpose-built platform, built on an open source core for analyzing metrics and events (time series data)",
+    "engine": "influxDb 1.5.1",
+    "nodes": [
+      {
+        "cloudlets": 8,
+        "nodeType": "centos7"
+      }
+    ],
+    "onInstall": [
+      {
+        "cmd[${targetNodes.nodeGroup}]": {
+                            "commands": [
+                                "yum install -y wget",
+                                "wget https://dl.influxdata.com/influxdb/releases/influxdb-1.5.1.x86_64.rpm",
+                                "yum localinstall influxdb-1.5.1.x86_64.rpm",
+                                "systemctl enable influxdb",
+                                "systemctl start influxdb",
+                                "wget https://dl.influxdata.com/chronograf/releases/chronograf-1.4.2.3.x86_64.rpm"
+                                "yum localinstall chronograf-1.4.2.3.x86_64.rpm",
+                                "systemctl enable chronograf",
+                                "systemctl start chronograf",
+                                "wget https://dl.influxdata.com/kapacitor/releases/kapacitor-1.4.1.x86_64.rpm"
+                                "yum localinstall kapacitor-1.4.1.x86_64.rpm",
+                                "systemctl enable kapacitor",
+                                "systemctl start kapacitor",
+                            ],
+          "user": "root",
+        }
+      },
+      {
+        "replaceInFile": [
+          {
+            "nodeType": "apache2",
+            "path": "/var/www/webroot/ROOT/config/autoconfig.php",
+            "replacements": [
+              {
+                "replacement": "${nodes.mysql5.address}",
+                "pattern": "{DB_HOST}"
+              },
+              {
+                "replacement": "owncloud",
+                "pattern": "{DB_USER}"
+              },
+              {
+                "replacement": "admin",
+                "pattern": "{ADMIN_NAME}"
+              },
+              {
+                "replacement": "owncloud",
+                "pattern": "{DB_NAME}"
+              },
+              {
+                "replacement": "${globals.PASSWD}",
+                "pattern": "{DB_PASSWORD}"
+              },
+              {
+                "replacement": "${user.appPassword}",
+                "pattern": "{ADMIN_PASSWORD}"
+              }
+            ]
+          },
+          {
+            "nodeType": "apache2",
+            "path": "/etc/php.ini",
+            "replacements": [
+              {
+                "replacement": "post_max_size = 256M",
+                "pattern": "post_max_size = 8M"
+              },
+              {
+                "replacement": "upload_max_filesize = 256M",
+                "pattern": "upload_max_filesize = 2M"
+              },
+              {
+                "replacement": "max_execution_time = 300",
+                "pattern": "max_execution_time = 30"
+              },
+              {
+                "pattern": ";extension=gd.so",
+                "replacement": "extension=gd.so"
+              },
+              {
+                "pattern": "cgi.fix_pathinfo=0",
+                "replacement": "cgi.fix_pathinfo=1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "restartNode": {
+          "nodeType": "centos7"
+        }
+      }
+    ],
+    "success": "Welcome to Influxdb world."
+  }
+}
