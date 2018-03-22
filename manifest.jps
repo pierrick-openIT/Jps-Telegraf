@@ -19,27 +19,38 @@
             "nodeType": "*"
         },
         "procedures": [{
-            "id": "log",
-            "onCall": {
-                "log": "${this.message}"
-            }
-        }, {
-            "id": "installPackage",
-            "onCall": [{
-                "cmd[${targetNodes.nodeGroup}]": {
-                    "commands": [
-                        "yum install -y wget",
-                        "wget https://dl.influxdata.com/telegraf/releases/telegraf-1.5.3-1.x86_64.rpm",
-                        "yum localinstall telegraf-1.5.3-1.x86_64.rpm",
-                        "systemctl enable telegraf",
-                        "systemctl start telegraf",
-                        "telegraf --input-filter ${this.TelegrafInput} --output-filter ${this.TelegrafOutput} config > /etc/telegraf/telegraf.conf " 
-                    ],
-                    "user": "root",
+                "id": "log",
+                "onCall": {
                     "log": "${this.message}"
                 }
-            }]
-        }, {
+            }, {
+                "id": "installPackage",
+                "onCall": [{
+                        "cmd[${targetNodes.nodeGroup}]": {
+                            "commands": [
+                                "yum install -y wget",
+                                "wget https://dl.influxdata.com/telegraf/releases/telegraf-1.5.3-1.x86_64.rpm",
+                                "yum localinstall telegraf-1.5.3-1.x86_64.rpm",
+                                "systemctl enable telegraf",
+                                "systemctl start telegraf",
+                                "telegraf --input-filter ${this.TelegrafInput} --output-filter ${this.TelegrafOutput} config > /etc/telegraf/telegraf.conf "
+                            ],
+                            "user": "root",
+                            "log": "${this.message}",
+                            
+                            "replaceInFile": {
+                                "nodeId" : "${targetNodes.nodeGroup}",
+                                "path": "/etc/telegraf/telegraf.conf",
+                                "replacements": [{
+                                    "pattern": "^PLUGINS$",
+                                    "replacement": "toto"
+                                }]
+                            }
+                        }
+                    
+                }]
+        },
+        {
             "id": "removePackage",
             "onCall": [{
                 "cmd": {
@@ -51,57 +62,56 @@
                 }
             }]
         }],
-        "menu": [{
-            "confirmText": "Install package",
-            "settings": "packageInstall",
-            "loadingText": "Installing package...",
-            "caption": "Install package",
-            "procedure": "installPackage",
-            "successText": "The package has been successfully installed"
-        }, {
-            "confirmText": "Remove package",
-            "settings": "packageRemove",
-            "loadingText": "Removing package...",
-            "caption": "Remove package",
-            "procedure": "removePackage",
-            "successText": "The package has been successfully removed"
-        }],
-        
-        
-        "settings": {
-            "packageInstall": {
-                "fields": [{
-                        "regexText": "Incorrect input.",
-                        "name": "TelegrafInput",
-                        "caption": "Telegraf Input:",
-                        "type": "string",
-                        "required": true },
-
-                        {
-                        "regexText": "Incorrect output.",
-                        "name": "TelegrafOutput",
-                        "caption": "telegraf Output:",
-                        "type": "string",
-                        "required": true }]},
-                    
-                   
-                    "packageRemove": {
-                        "fields": [{
-                            "regexText": "Incorrect package name.",
-                            "name": "packageRemove",
-                            "caption": "Package:",
-                            "type": "string",
-                            "required": true
-                        }, {
-                            "caption": "Instruction:",
-                            "type": "displayfield",
-                            "markup": "To remove a package, specify its name in the box above. For several entries, use space as a separator.",
-                            "required": true
-                        }]
-                    }
+    "menu": [{
+        "confirmText": "Install package",
+        "settings": "packageInstall",
+        "loadingText": "Installing package...",
+        "caption": "Install package",
+        "procedure": "installPackage",
+        "successText": "The package has been successfully installed"
+    }, {
+        "confirmText": "Remove package",
+        "settings": "packageRemove",
+        "loadingText": "Removing package...",
+        "caption": "Remove package",
+        "procedure": "removePackage",
+        "successText": "The package has been successfully removed"
+    }],
+    "settings": {
+        "packageInstall": {
+            "fields": [{
+                    "regexText": "Incorrect input.",
+                    "name": "TelegrafInput",
+                    "caption": "Telegraf Input:",
+                    "type": "string",
+                    "required": true
                 },
-                "success": {
-                    "text": "Need to change this sweety text"
+                {
+                    "regexText": "Incorrect output.",
+                    "name": "TelegrafOutput",
+                    "caption": "telegraf Output:",
+                    "type": "string",
+                    "required": true
                 }
-            }
+            ]
+        },
+        "packageRemove": {
+            "fields": [{
+                "regexText": "Incorrect package name.",
+                "name": "packageRemove",
+                "caption": "Package:",
+                "type": "string",
+                "required": true
+            }, {
+                "caption": "Instruction:",
+                "type": "displayfield",
+                "markup": "To remove a package, specify its name in the box above. For several entries, use space as a separator.",
+                "required": true
+            }]
         }
+    },
+    "success": {
+        "text": "Click <b>Add-ons</b> for a destination node to locate <b>Yum Packages Installer</b>. To use the add-on, expand the menu in the upper-right corner, click <b>Install package</b> and specify name and/or URL of the required packages."
+    }
+}
+}
