@@ -38,7 +38,10 @@
                                 "wget https://dl.influxdata.com/kapacitor/releases/kapacitor-1.4.1.x86_64.rpm",
                                 "yum localinstall kapacitor-1.4.1.x86_64.rpm",
                                 "systemctl enable kapacitor",
-                                "systemctl start kapacitor"
+                                "systemctl start kapacitor",
+                                "yum install https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana-5.0.3-1.x86_64.rpm",
+                                "systemctl start grafana-server",
+                                "systemctl enable grafana-server.service"        
             ],
             "nodeType": "centos7"
           }
